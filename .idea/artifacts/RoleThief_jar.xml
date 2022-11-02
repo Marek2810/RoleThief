@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="RoleThief:jar">
+    <output-path>$PROJECT_DIR$/../../../MC/MyPlugins/RP/</output-path>
+    <root id="archive" name="RoleThief.jar">
+      <element id="module-output" name="RoleThief" />
+    </root>
+  </artifact>
+</component>

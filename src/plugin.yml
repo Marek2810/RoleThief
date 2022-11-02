@@ -1,0 +1,15 @@
+main: me.Marek2810.RoleThief.Main
+name: RoleThief
+version: 0.01
+author: Marek2810
+api-version: 1.17
+
+commands:
+  thief:
+    permission: rolethief.thief
+    permission-message: You do not have permission!
+
+permissions:
+  rolethief.thief:
+    description: Allows to /thief <player> command.
+    default: false
