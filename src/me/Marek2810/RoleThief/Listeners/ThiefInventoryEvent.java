@@ -9,64 +9,79 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import me.Marek2810.RoleThief.Main;
 import me.Marek2810.RoleThief.Commands.Thief;
-import net.md_5.bungee.api.ChatColor;
 
 public class ThiefInventoryEvent implements Listener {
 
     @EventHandler
     public void onInventoryClick (InventoryClickEvent event) {
-        if (!(Thief.thiefedInvs.containsValue(event.getInventory()))) return;
-        if (event.getClickedInventory() == null) return;
-        if ( !(event.getClickedInventory().getType().equals(InventoryType.CHEST)) ) return;        
-        if (event.getAction().equals(InventoryAction.NOTHING)) return;
+    	if (event.getClickedInventory() == null) return;
+    	if ( !(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
+    	if ( event.getClickedInventory().getType().equals(InventoryType.PLAYER) ) return; 
+        if ( event.getAction().equals(InventoryAction.NOTHING)) return;
 
         Player player = (Player) event.getWhoClicked();
-        player.sendMessage(ChatColor.GOLD + "YEP");
-        player.sendMessage("Inventory action: " + event.getAction());
-        player.sendMessage("Clicked slot: " + event.getCurrentItem() );
-        player.sendMessage("Cursor: " + event.getCursor());        
-        
-        if (event.getAction().equals(InventoryAction.PICKUP_ALL)
-        		|| event.getAction().equals(InventoryAction.DROP_ALL_SLOT)) {
-        	Thief.thiefs.get(player).getInventory().setItem(event.getSlot(), null);        	
-        }
-        else if (event.getAction().equals(InventoryAction.PICKUP_HALF)) {
-        	ItemStack item = new ItemStack(event.getCurrentItem());
-        	int amount = event.getCurrentItem().getAmount();
-        	item.setAmount(amount/2);
-        	Thief.thiefs.get(player).getInventory().setItem(event.getSlot(), item); 
-        }
-        else if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
-        	Thief.thiefs.get(player).getInventory().setItem(event.getSlot(), event.getCursor()); 
-        }
-//        else {
-//        	event.setCancelled(true);
-//        	player.sendMessage(ChatColor.RED + "Problém šéfe..." + ChatColor.GOLD 
-//        			+ "Inventory action: " + event.getAction()  );
-//        }
+            
+        new BukkitRunnable() {
+        	public void run() {
+        		checkThiefGUI(player, event.getInventory());
+    		}
+    	}.runTaskLater(Main.getPlugin(Main.class), 1);    	   	
     }
     
     @EventHandler
     public void onInventoryDrag (InventoryDragEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        player.sendMessage(ChatColor.GOLD + "Drag event");
+    	if (!(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
+    	
+    	Player player = (Player) event.getWhoClicked();
+    	new BukkitRunnable() {
+			public void run() {
+				if ( ! (checkThiefGUI(player, event.getInventory())) ) {
+					event.setCancelled(true);
+					player.sendMessage("Chyba.");
+					return;
+				}
+				checkThiefGUI(player, event.getInventory());		
+			}
+		}.runTaskLater(Main.getPlugin(Main.class), 1);
     }
 
-    public void updateInventory (Player player, Inventory inv) {
-        Inventory thiefPlayerInv = Thief.thiefs.get(player).getInventory();
+    public boolean checkThiefGUI (Player player, Inventory inv) {
+    	boolean output = false;
         for(int i = 0; i < 36; i++) {
-//            player.sendMessage("Slot: " + i);
-//                player.sendMessage("GUI: " + event.getInventory().getItem(i));
-//                player.sendMessage("Player: " +  thiefPlayerInv.getItem(i));
-            if ( !(InventoryEvent.prevThiefedInvs.get(player).getItem(i).equals(thiefPlayerInv.getItem(i)) ) ) {
-                player.sendMessage(ChatColor.GREEN + "Zmena u playera");
-            }
-            if ( !InventoryEvent.prevThiefGUI.get(player).getItem(i).equals(inv.getItem(i)) ) {
-                player.sendMessage(ChatColor.RED + "Zmena v GUI");
-            }
+        	if ( InventoryEvent.prevThiefGUI.get(player).getItem(i) == null 
+        			&& inv.getItem(i) == null ) continue;        	
+        	if ( InventoryEvent.prevThiefGUI.get(player).getItem(i) == null) {
+        		updateThiefedPinv(player, i, inv.getItem(i));
+//        		player.sendMessage("--- " + i + " --- (pGUI)");
+//        		player.sendMessage( ChatColor.GREEN + "Zmena v gui");
+//        		player.sendMessage("p GUI: " + InventoryEvent.prevThiefGUI.get(player).getItem(i));
+//        		player.sendMessage("GUI: " + inv.getItem(i));
+        		output = true;
+        		continue;
+        	}
+        	else if ( inv.getItem(i) == null ) {
+        		updateThiefedPinv(player, i, null);
+        		output = true;
+        		continue;
+        	}
+        	else if ( !( InventoryEvent.prevThiefGUI.get(player).getItem(i).equals(inv.getItem(i) ) )) {
+        		updateThiefedPinv(player, i, inv.getItem(i));
+        		output = true;
+        		continue;
+        	}
+        	if ( InventoryEvent.prevThiefGUI.get(player).getItem(i).equals(inv.getItem(i))) continue;
+        	return false;
         }
+        return output;
     }
-
+    
+    public void updateThiefedPinv (Player player, int slot, ItemStack item) {
+    	Thief.thiefs.get(player).getInventory().setItem(slot, item);
+    	InventoryEvent.prevThiefGUI.get(player).setItem(slot, item);
+    	//InventoryEvent.prevThiefGUI.get(player).setItem(slot, item);
+    }
 }

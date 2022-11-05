@@ -16,6 +16,7 @@ public class Thief implements CommandExecutor {
 
     public static HashMap<Player, Inventory> thiefedInvs = new HashMap<Player, Inventory>();
     public static HashMap<Player, Player> thiefs = new HashMap<Player, Player>();
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if ( ! (sender instanceof Player) ) {
