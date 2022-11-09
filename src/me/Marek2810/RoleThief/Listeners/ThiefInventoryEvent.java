@@ -38,7 +38,7 @@ public class ThiefInventoryEvent implements Listener {
         
         cd.put(player, System.currentTimeMillis()+250);
         
-        if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
+        if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
@@ -53,7 +53,9 @@ public class ThiefInventoryEvent implements Listener {
 
         new BukkitRunnable() {
 			public void run() {
-				InventoryUtils.update(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory());
+				if (InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory()))
+					cancel();
+				InventoryUtils.update(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory());
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 			
@@ -74,7 +76,7 @@ public class ThiefInventoryEvent implements Listener {
         
         cd.put(player, System.currentTimeMillis()+250);
         
-        if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
+        if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
@@ -89,7 +91,7 @@ public class ThiefInventoryEvent implements Listener {
 
         new BukkitRunnable() {
 			public void run() {
-				InventoryUtils.update(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory());
+				InventoryUtils.update(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory());
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1);

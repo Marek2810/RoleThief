@@ -12,6 +12,26 @@ import net.md_5.bungee.api.ChatColor;
 
 public class InventoryEvent implements Listener {
 
+<<<<<<< Updated upstream
+=======
+	public static HashMap<Player, Inventory> prevThiefGUI = new HashMap<Player, Inventory>();
+	public static HashMap<Player, Inventory> pretvThiefPinv = new HashMap<Player, Inventory>();
+	
+	@EventHandler
+	public void onInventoryOpen(InventoryOpenEvent event) {
+		 if ( !(Thief.thiefedInvs.containsValue(event.getInventory()) ) ) return;
+		 Player player = (Player) event.getPlayer();
+		 Inventory savedGUI = Bukkit.createInventory(null, 36);
+		 Inventory savedThiefedPlayer = Bukkit.createInventory(null, 36);
+		 for (int i = 0; i < 36; i++ ) {
+			 savedGUI.setItem(i, event.getInventory().getItem(i));
+			 savedThiefedPlayer.setItem(i, Thief.thiefedPlayers.get(player).getInventory().getItem(i));
+		 }
+		 prevThiefGUI.put(player, savedGUI);
+		 pretvThiefPinv.put(player, savedThiefedPlayer);	 
+	}
+	
+>>>>>>> Stashed changes
     //Check if inventories are synced 
     @EventHandler
     public void onInventoryClose (InventoryCloseEvent event) {
