@@ -40,7 +40,7 @@ public class InventoryEvent implements Listener {
     public void onPlayerQuit (PlayerQuitEvent event) {
         Player player = (Player) event.getPlayer();
         Thief.thiefedInvs.remove(player);
+        Thief.thiefPlayers.remove(Thief.thiefedPlayers.get(player));
         Thief.thiefedPlayers.remove(player);
     }
-
 }
