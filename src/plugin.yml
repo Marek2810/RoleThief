@@ -12,4 +12,4 @@ commands:
 permissions:
   rolethief.thief:
     description: Allows to /thief <player> command.
-    default: false
+    default: op
