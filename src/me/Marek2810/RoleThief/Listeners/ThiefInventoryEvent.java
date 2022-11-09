@@ -32,11 +32,14 @@ public class ThiefInventoryEvent implements Listener {
         if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
             event.setCancelled(true);
             return;
+        } else {
+        	cd.remove(player);
         }
         
         cd.put(player, System.currentTimeMillis()+250);
         
         if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
+        	player.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -58,13 +61,21 @@ public class ThiefInventoryEvent implements Listener {
     
     @EventHandler
     public void onInventoryDrag (InventoryDragEvent event) {
+    	if (event.getInventory() == null) return;
     	if ( !(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
     	if ( event.getInventory().getType().equals(InventoryType.PLAYER) ) return; 
-    	
     	Player player = (Player) event.getWhoClicked();
-    	player.sendMessage(ChatColor.GOLD + "Drag event");
-    	
-    	if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {
+        if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
+            event.setCancelled(true);
+            return;
+        } else {
+        	cd.remove(player);
+        }
+        
+        cd.put(player, System.currentTimeMillis()+250);
+        
+        if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
+        	player.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -81,6 +92,6 @@ public class ThiefInventoryEvent implements Listener {
 				InventoryUtils.update(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory());
 				cancel();
 			} 
-		}.runTaskLater(Main.getPlugin(Main.class), 1); 	 
+		}.runTaskLater(Main.getPlugin(Main.class), 1);
     }
 }
