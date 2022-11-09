@@ -36,9 +36,9 @@ public class ThiefInventoryEvent implements Listener {
         
         cd.put(player, System.currentTimeMillis()+250);
         
-        if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {
-        	ItemStack item = new ItemStack(Material.AIR);
+        if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	for (int i = 0; i < 36; i++) {
+        		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
         			item = Thief.thiefedPlayers.get(player).getInventory().getItem(i);
         		}
@@ -65,8 +65,8 @@ public class ThiefInventoryEvent implements Listener {
     	player.sendMessage(ChatColor.GOLD + "Drag event");
     	
     	if ( !(InventoryUtils.syncCheck(player, event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {
-        	ItemStack item = new ItemStack(Material.AIR);
         	for (int i = 0; i < 36; i++) {
+        		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
         			item = Thief.thiefedPlayers.get(player).getInventory().getItem(i);
         		}
