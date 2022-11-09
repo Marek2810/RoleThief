@@ -17,7 +17,7 @@ public class InventoryEvent implements Listener {
     public void onInventoryClose (InventoryCloseEvent event) {
         if (Thief.thiefedInvs.containsValue(event.getInventory())) {
             Player player = (Player) event.getPlayer();
-            Inventory thiefPinv = Thief.thiefs.get(player).getInventory();
+            Inventory thiefPinv = Thief.thiefedPlayers.get(player).getInventory();
             for (int i = 0; i < 36; i++) {
                 if ( event.getInventory().getItem(i) == null && thiefPinv.getItem(i) == null ) continue;
                 if (event.getInventory().getItem(i) == null) {
@@ -31,7 +31,8 @@ public class InventoryEvent implements Listener {
                 if ( ! (event.getInventory().getItem(i).equals(thiefPinv.getItem(i))) ) player.sendMessage(ChatColor.RED + String.valueOf(i) + " Chyba..");
             }
             Thief.thiefedInvs.remove(player);
-            Thief.thiefs.remove(player);
+            Thief.thiefPlayers.remove(Thief.thiefedPlayers.get(player));
+            Thief.thiefedPlayers.remove(player);            
         }
     }
 
@@ -39,7 +40,7 @@ public class InventoryEvent implements Listener {
     public void onPlayerQuit (PlayerQuitEvent event) {
         Player player = (Player) event.getPlayer();
         Thief.thiefedInvs.remove(player);
-        Thief.thiefs.remove(player);
+        Thief.thiefedPlayers.remove(player);
     }
 
 }

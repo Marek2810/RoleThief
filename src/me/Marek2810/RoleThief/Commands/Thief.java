@@ -15,7 +15,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Thief implements CommandExecutor {
 
     public static HashMap<Player, Inventory> thiefedInvs = new HashMap<Player, Inventory>();
-    public static HashMap<Player, Player> thiefs = new HashMap<Player, Player>();
+    public static HashMap<Player, Player> thiefedPlayers = new HashMap<Player, Player>();
+    public static HashMap<Player, Player> thiefPlayers = new HashMap<Player, Player>();
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -51,7 +52,8 @@ public class Thief implements CommandExecutor {
             inv.setItem(i, inventorySlot);
         }
         thiefedInvs.put(player, inv);
-        thiefs.put(player, thiefedPlayer);
+        thiefedPlayers.put(player, thiefedPlayer);
+        thiefPlayers.put(thiefedPlayer, player);
         return inv;
     }
 }
