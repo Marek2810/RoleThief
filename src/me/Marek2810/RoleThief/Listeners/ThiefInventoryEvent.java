@@ -40,6 +40,7 @@ public class ThiefInventoryEvent implements Listener {
         
         if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -78,6 +79,7 @@ public class ThiefInventoryEvent implements Listener {
         
         if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage(ChatColor.RED + "Desync!");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -95,6 +97,7 @@ public class ThiefInventoryEvent implements Listener {
 						Thief.thiefedPlayers.get(player).getInventory());
 				cancel();
 			} 
-		}.runTaskLater(Main.getPlugin(Main.class), 1); 	
-    }
+		}.runTaskLater(Main.getPlugin(Main.class), 1);	
+    }   
+    
 }
