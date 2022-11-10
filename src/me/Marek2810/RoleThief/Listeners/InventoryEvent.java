@@ -39,9 +39,17 @@ public class InventoryEvent implements Listener {
     @EventHandler
     public void onPlayerQuit (PlayerQuitEvent event) {
         Player player = (Player) event.getPlayer();
-        Thief.thiefedInvs.remove(player);
-        Thief.thiefPlayers.remove(Thief.thiefedPlayers.get(player));
-        Thief.thiefedPlayers.remove(player);
+        if (Thief.thiefedPlayers.containsValue(player)) {
+        	Thief.thiefPlayers.get(player).closeInventory();        	
+        	Thief.thiefPlayers.remove( Thief.thiefedPlayers.get(player) );
+        	Thief.thiefedInvs.remove( Thief.thiefedPlayers.get(player) );
+        	Thief.thiefedPlayers.remove(player);        	
+        }
+        if (Thief.thiefPlayers.containsValue(player)) {
+        	Thief.thiefedPlayers.remove( Thief.thiefPlayers.get(player) );
+        	Thief.thiefPlayers.remove(player);
+        	Thief.thiefedInvs.remove(player);
+        }        
         ThiefInventoryEvent.cd.remove(player);
     }
 }
