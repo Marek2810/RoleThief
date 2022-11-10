@@ -1,9 +1,13 @@
 package me.Marek2810.RoleThief.Listeners;
 
+import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -12,8 +16,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class InventoryEvent implements Listener {
 
-<<<<<<< Updated upstream
-=======
 	public static HashMap<Player, Inventory> prevThiefGUI = new HashMap<Player, Inventory>();
 	public static HashMap<Player, Inventory> pretvThiefPinv = new HashMap<Player, Inventory>();
 	
@@ -31,7 +33,7 @@ public class InventoryEvent implements Listener {
 		 pretvThiefPinv.put(player, savedThiefedPlayer);	 
 	}
 	
->>>>>>> Stashed changes
+
     //Check if inventories are synced 
     @EventHandler
     public void onInventoryClose (InventoryCloseEvent event) {
@@ -63,5 +65,7 @@ public class InventoryEvent implements Listener {
         Thief.thiefPlayers.remove(Thief.thiefedPlayers.get(player));
         Thief.thiefedPlayers.remove(player);
         ThiefInventoryEvent.cd.remove(player);
+        prevThiefGUI.remove(player);
+        pretvThiefPinv.remove(player);
     }
 }
