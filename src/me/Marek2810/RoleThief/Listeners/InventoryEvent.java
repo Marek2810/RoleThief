@@ -1,13 +1,9 @@
 package me.Marek2810.RoleThief.Listeners;
 
-import java.util.HashMap;
-
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -15,24 +11,6 @@ import me.Marek2810.RoleThief.Commands.Thief;
 import net.md_5.bungee.api.ChatColor;
 
 public class InventoryEvent implements Listener {
-
-	public static HashMap<Player, Inventory> prevThiefGUI = new HashMap<Player, Inventory>();
-	public static HashMap<Player, Inventory> pretvThiefPinv = new HashMap<Player, Inventory>();
-	
-	@EventHandler
-	public void onInventoryOpen(InventoryOpenEvent event) {
-		 if ( !(Thief.thiefedInvs.containsValue(event.getInventory()) ) ) return;
-		 Player player = (Player) event.getPlayer();
-		 Inventory savedGUI = Bukkit.createInventory(null, 36);
-		 Inventory savedThiefedPlayer = Bukkit.createInventory(null, 36);
-		 for (int i = 0; i < 36; i++ ) {
-			 savedGUI.setItem(i, event.getInventory().getItem(i));
-			 savedThiefedPlayer.setItem(i, Thief.thiefedPlayers.get(player).getInventory().getItem(i));
-		 }
-		 prevThiefGUI.put(player, savedGUI);
-		 pretvThiefPinv.put(player, savedThiefedPlayer);	 
-	}
-	
 
     //Check if inventories are synced 
     @EventHandler
@@ -65,7 +43,5 @@ public class InventoryEvent implements Listener {
         Thief.thiefPlayers.remove(Thief.thiefedPlayers.get(player));
         Thief.thiefedPlayers.remove(player);
         ThiefInventoryEvent.cd.remove(player);
-        prevThiefGUI.remove(player);
-        pretvThiefPinv.remove(player);
     }
 }

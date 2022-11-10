@@ -27,9 +27,7 @@ public class ThiefedPlayerEvent implements Listener {
     	if ( event.getAction().equals(InventoryAction.NOTHING)) return;
     	Player player = (Player) event.getWhoClicked();
     	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
-    	
-    	player.sendMessage("zmena u playera");
-        
+       
         if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
             event.setCancelled(true);
             return;
@@ -53,7 +51,7 @@ public class ThiefedPlayerEvent implements Listener {
         }    
 
         new BukkitRunnable() {
-			public void run() {			
+			public void run() {
 				InventoryUtils.update(player.getInventory(),
 						Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)));
 				cancel();
@@ -65,9 +63,7 @@ public class ThiefedPlayerEvent implements Listener {
     public void onInventoryDrag (InventoryDragEvent event) {
     	if (event.getInventory() == null) return;    	
     	Player player = (Player) event.getWhoClicked();
-    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
-    	
-    	player.sendMessage("drag zmena u playera");
+    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;    	
         
         if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
             event.setCancelled(true);

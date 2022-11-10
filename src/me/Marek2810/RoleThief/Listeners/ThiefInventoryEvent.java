@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -26,16 +25,16 @@ public class ThiefInventoryEvent implements Listener {
     public void onInventoryClick (InventoryClickEvent event) {
     	if (event.getClickedInventory() == null) return;
     	if ( !(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
-    	if ( event.getClickedInventory().getType().equals(InventoryType.PLAYER) ) return; 
         if ( event.getAction().equals(InventoryAction.NOTHING)) return;
         Player player = (Player) event.getWhoClicked();
+    	if ( !(Thief.thiefPlayers.containsValue(player)) ) return;
+
         if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
             event.setCancelled(true);
             return;
         } else {
         	cd.remove(player);
         }
-        player.sendMessage("zmena v GUI");
         
         cd.put(player, System.currentTimeMillis()+250);
         
@@ -65,8 +64,9 @@ public class ThiefInventoryEvent implements Listener {
     public void onInventoryDrag (InventoryDragEvent event) {
     	if (event.getInventory() == null) return;
     	if ( !(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
-    	if ( event.getInventory().getType().equals(InventoryType.PLAYER) ) return; 
     	Player player = (Player) event.getWhoClicked();
+    	if ( !(Thief.thiefPlayers.containsValue(player)) ) return;
+
         if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
             event.setCancelled(true);
             return;
@@ -90,7 +90,7 @@ public class ThiefInventoryEvent implements Listener {
         }    
 
         new BukkitRunnable() {
-			public void run() {			
+			public void run() {	
 				InventoryUtils.update(event.getInventory(),
 						Thief.thiefedPlayers.get(player).getInventory());
 				cancel();
