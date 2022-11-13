@@ -50,6 +50,5 @@ public class InventoryEvent implements Listener {
         	Thief.thiefPlayers.remove(player);
         	Thief.thiefedInvs.remove(player);
         }        
-        ThiefInventoryEvent.cd.remove(player);
     }
 }

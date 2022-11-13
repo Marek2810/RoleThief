@@ -1,7 +1,5 @@
 package me.Marek2810.RoleThief.Listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,8 +16,6 @@ import me.Marek2810.RoleThief.Utils.InventoryUtils;
 import net.md_5.bungee.api.ChatColor;
 
 public class ThiefInventoryEvent implements Listener {
-	
-	static HashMap<Player, Long> cd = new HashMap<Player, Long>();
 
     @EventHandler
     public void onInventoryClick (InventoryClickEvent event) {
@@ -28,19 +24,18 @@ public class ThiefInventoryEvent implements Listener {
         if ( event.getAction().equals(InventoryAction.NOTHING)) return;
         Player player = (Player) event.getWhoClicked();
     	if ( !(Thief.thiefPlayers.containsValue(player)) ) return;
-
-        if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	}
         
         if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
         	Main.console.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage("Player: " + event.getWhoClicked());
+        	Main.console.sendMessage("Click: " + event.getAction());
+        	Main.console.sendMessage("Slot: " + event.getSlot() + " Item: " + event.getCurrentItem());
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -52,10 +47,15 @@ public class ThiefInventoryEvent implements Listener {
         	return;
         }    
 
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefedPlayers.get(player), true);
+        
         new BukkitRunnable() {
 			public void run() {				
 				InventoryUtils.update(event.getInventory(),
 						Thief.thiefedPlayers.get(player).getInventory());
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefedPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 			
@@ -67,19 +67,17 @@ public class ThiefInventoryEvent implements Listener {
     	if ( !(Thief.thiefedInvs.containsValue(event.getInventory())) ) return;
     	Player player = (Player) event.getWhoClicked();
     	if ( !(Thief.thiefPlayers.containsValue(player)) ) return;
-
-        if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	}
         
         if ( !(InventoryUtils.syncCheck(event.getInventory(), Thief.thiefedPlayers.get(player).getInventory())) ) {       	
         	player.sendMessage(ChatColor.RED + "Desync!");
         	Main.console.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage("Player: " + event.getWhoClicked());
+        	Main.console.sendMessage("Click: drag");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedPlayers.get(player).getInventory().getItem(i) != null) {
@@ -91,10 +89,15 @@ public class ThiefInventoryEvent implements Listener {
         	return;
         }    
 
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefedPlayers.get(player), true);
+        
         new BukkitRunnable() {
-			public void run() {	
+			public void run() {					
 				InventoryUtils.update(event.getInventory(),
 						Thief.thiefedPlayers.get(player).getInventory());
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefedPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1);	

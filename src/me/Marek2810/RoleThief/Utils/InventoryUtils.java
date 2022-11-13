@@ -1,10 +1,14 @@
 package me.Marek2810.RoleThief.Utils;
 
+import java.util.HashMap;
 import java.util.Objects;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public class InventoryUtils {
+	
+	public static HashMap<Player, Boolean> processingCheck = new HashMap<Player, Boolean>();
 
 	public static void update(Inventory baseInv, Inventory updateInv) {
 	  	  for(int i = 0; i < 36; i++){

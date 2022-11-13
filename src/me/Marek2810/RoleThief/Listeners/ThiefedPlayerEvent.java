@@ -1,7 +1,5 @@
 package me.Marek2810.RoleThief.Listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -22,7 +20,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class ThiefedPlayerEvent implements Listener {
 	
-	static HashMap<Player, Long> cd = new HashMap<Player, Long>();
 
     @EventHandler
     public void onInventoryClick (InventoryClickEvent event) {
@@ -30,18 +27,18 @@ public class ThiefedPlayerEvent implements Listener {
     	if ( event.getAction().equals(InventoryAction.NOTHING)) return;
     	Player player = (Player) event.getWhoClicked();
     	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
-       
-        if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
-        
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	} 
+    	
         if ( !(InventoryUtils.syncCheck(player.getInventory(), Thief.thiefedInvs.get( Thief.thiefPlayers.get(player) ) )) ) {  
         	player.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage("Player: " + event.getWhoClicked());
+        	Main.console.sendMessage("Click: " + event.getAction());
+        	Main.console.sendMessage("Slot: " + event.getSlot() + " Item: " + event.getCurrentItem());
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)).getItem(i) != null) {
@@ -52,11 +49,16 @@ public class ThiefedPlayerEvent implements Listener {
         	event.setCancelled(true);
         	return;
         }    
-
+        
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefPlayers.get(player), true);
+        
         new BukkitRunnable() {
 			public void run() {
 				InventoryUtils.update(player.getInventory(),
 						Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)));
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 			
@@ -66,20 +68,18 @@ public class ThiefedPlayerEvent implements Listener {
     public void onInventoryDrag (InventoryDragEvent event) {
     	if (event.getInventory() == null) return;    	
     	Player player = (Player) event.getWhoClicked();
-    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;    	
-        
-        if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
+    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	}
         
         if ( !(InventoryUtils.syncCheck(player.getInventory(), Thief.thiefedInvs.get( Thief.thiefPlayers.get(player) ) )) ) {  
         	player.sendMessage(ChatColor.RED + "Desync!");
         	Main.console.sendMessage(ChatColor.RED + "Desync!");
+        	Main.console.sendMessage("Player: " + event.getWhoClicked());
+        	Main.console.sendMessage("Click: drag");
         	for (int i = 0; i < 36; i++) {
         		ItemStack item = new ItemStack(Material.AIR);
         		if (Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)).getItem(i) != null) {
@@ -91,10 +91,15 @@ public class ThiefedPlayerEvent implements Listener {
         	return;
         }    
 
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefPlayers.get(player), true);
+        
         new BukkitRunnable() {
 			public void run() {
 				InventoryUtils.update(player.getInventory(),
 						Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)));
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 	
@@ -105,18 +110,12 @@ public class ThiefedPlayerEvent implements Listener {
     	if ( !(event.getEntityType().equals(EntityType.PLAYER)) ) return;
     	Player player = (Player) event.getEntity();
     	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	}
     	
-    	player.sendMessage("pick up");
-    	
-    	if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
-        
         if ( !(InventoryUtils.syncCheck(player.getInventory(), Thief.thiefedInvs.get( Thief.thiefPlayers.get(player) ) )) ) {  
         	player.sendMessage(ChatColor.RED + "Desync!");
         	Main.console.sendMessage(ChatColor.RED + "Desync!");
@@ -130,11 +129,16 @@ public class ThiefedPlayerEvent implements Listener {
         	event.setCancelled(true);
         	return;
         }    
+        
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefPlayers.get(player), true);
 
         new BukkitRunnable() {
 			public void run() {
 				InventoryUtils.update(player.getInventory(),
 						Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)));
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 
@@ -144,38 +148,22 @@ public class ThiefedPlayerEvent implements Listener {
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
     	if (event.getItemDrop() == null ) return;
     	Player player = (Player) event.getPlayer();
-    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;
-    	
-    	player.sendMessage("drop item");
-    	
-    	if (cd.get(player) != null && cd.get(player) > System.currentTimeMillis() ) {
-            event.setCancelled(true);
-            return;
-        } else {
-        	cd.remove(player);
-        }
-        
-        cd.put(player, System.currentTimeMillis()+250);
-        
-//        if ( !(InventoryUtils.syncCheck(player.getInventory(), Thief.thiefedInvs.get( Thief.thiefPlayers.get(player) ) )) ) {  
-//        	player.sendMessage(ChatColor.RED + "Desync!");
-//        	Main.console.sendMessage(ChatColor.RED + "Desync!");
-//        	player.sendMessage("Slot: " event.get);
-//        	for (int i = 0; i < 36; i++) {
-//        		ItemStack item = new ItemStack(Material.AIR);
-//        		if (Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)).getItem(i) != null) {
-//        			item = Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)).getItem(i);
-//        		}
-//        		player.getInventory().setItem(i, item);
-//        	}        	
-//        	event.setCancelled(true);
-//        	return;
-//        }    
+    	if ( !(Thief.thiefedPlayers.containsValue(player)) ) return;   
+    	if ( InventoryUtils.processingCheck.containsKey(player) 
+    			&&  InventoryUtils.processingCheck.get(player) ) {
+    		event.setCancelled(true);
+    		return;
+    	}
+       
+        InventoryUtils.processingCheck.put(player, true);
+        InventoryUtils.processingCheck.put(Thief.thiefPlayers.get(player), true);
 
         new BukkitRunnable() {
 			public void run() {
 				InventoryUtils.update(player.getInventory(),
 						Thief.thiefedInvs.get( Thief.thiefPlayers.get(player)));
+				InventoryUtils.processingCheck.remove(player);
+		        InventoryUtils.processingCheck.remove(Thief.thiefPlayers.get(player));
 				cancel();
 			} 
 		}.runTaskLater(Main.getPlugin(Main.class), 1); 
